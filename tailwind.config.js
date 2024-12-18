@@ -10,6 +10,7 @@ export default {
       colors: {
         customPink: 'rgba(230, 74, 105, 0.553)',
         hoverRed: 'rgba(220, 20, 60, 0.796)',
+        customGray: '#dddddd35',
       },
       borderColor: {
         'custom-gray': '#dddddd35',
