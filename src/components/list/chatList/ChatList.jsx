@@ -1,11 +1,13 @@
 import React from 'react'
 import { useState } from 'react'
+import AddUser from './addUser/AddUser'
+
 const ChatList = () => {
 	const [addMode, setAddMode] = useState(false)
 	return (
 		<div className='flex-1 overflow-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[#131e33ab] scrollbar-track-transparent'>{/* Chatlist */}
 			<div className='flex items-center gap-5 p-5'>{/* Search */}
-				<div className='bg-[#11192880] flex items-center gap-5 p-[10px] rounded-[10px]'>{/* SearchBar */}
+				<div className='bg-customDarkBlue flex items-center gap-5 p-[10px] rounded-[10px]'>{/* SearchBar */}
 					<img className='w-5 h-5' src="./search.png" alt="search" />
 					<input className='bg-transparent outline-none border-none text-white w-full' type="text" placeholder='Search' />
 				</div>
@@ -41,6 +43,7 @@ const ChatList = () => {
 					<p className='text-sm font-light'>Hello</p>
 				</div>
 			</div>
+			{addMode && <AddUser />}
 		</div>
 	)
 }

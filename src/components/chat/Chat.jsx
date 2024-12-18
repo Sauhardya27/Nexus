@@ -80,7 +80,7 @@ const Chat = () => {
 					<img className='w-5 h-5 cursor-pointer' src="./mic.png" alt="mic" />
 				</div>
 
-				<input className='flex-1 bg-[#11192880] outline-none border-none text-white p-3 rounded-[10px] text-base' type="text" value={text} placeholder='Type a message...' onChange={e => setText(e.target.value)}/>
+				<input className='flex-1 bg-customDarkBlue outline-none border-none text-white p-3 rounded-[10px] text-base' type="text" value={text} placeholder='Type a message...' onChange={e => setText(e.target.value)}/>
 
 				<div className='relative'>{/* Emoji */}
 					<img className='w-5 h-5 cursor-pointer' src="./emoji.png" alt="emoji" onClick={() => setOpen(prev => !prev)} />
