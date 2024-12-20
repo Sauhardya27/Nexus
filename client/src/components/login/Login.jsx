@@ -1,6 +1,8 @@
 import React from 'react'
 import { useState } from 'react'
 import { toast } from 'react-toastify';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../lib/firebase';
 
 const Login = () => {
 	const [avatar, setAvatar] = useState({
@@ -9,7 +11,7 @@ const Login = () => {
 	});
 
 	const handleAvatar = e => {
-		if(e.target.files[0]){
+		if (e.target.files[0]) {
 			setAvatar({
 				file: e.target.files[0],
 				url: URL.createObjectURL(e.target.files[0])
@@ -19,7 +21,27 @@ const Login = () => {
 
 	const handleLogin = e => {
 		e.preventDefault();
-		toast.warn("Hello")
+	}
+
+	const handleRegister = async (e) => {
+		e.preventDefault();
+		const formData = new FormData();
+		formData.append("username", e.target.username.value);
+		formData.append("email", e.target.email.value);
+		formData.append("password", e.target.password.value);
+		if (avatar.file) formData.append("avatar", avatar.file);
+
+		try {
+			const { data } = await axios.post("/api/users/register", formData, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
+			toast.success("User registered successfully!");
+		} catch (error) {
+			console.error(error);
+			toast.error(error.response?.data?.message || "Registration failed!");
+		}
 	}
 
 	return (
@@ -37,12 +59,12 @@ const Login = () => {
 			</div>
 			<div className='flex-1 flex flex-col items-center gap-5'>{/* Item */}
 				<h2 className='text-3xl font-bold'>Create an Account</h2>
-				<form className='flex flex-col items-center justify-center gap-5'>
+				<form onSubmit={handleRegister} className='flex flex-col items-center justify-center gap-5'>
 					<label className='w-full flex items-center justify-center gap-10 cursor-pointer underline' htmlFor="file">
 						<img className='w-[50px] h-[50px] rounded-[10px] object-cover opacity-60' src={avatar.url || "./avatar.png"} alt="avatar" />
 						Upload an image
 					</label>
-					<input className='p-3 border-none outline-none bg-[#111928] bg-opacity-60 text-white rounded-[5px] hidden' type="file" name="avatar" id="file" onChange={handleAvatar}/>
+					<input className='p-3 border-none outline-none bg-[#111928] bg-opacity-60 text-white rounded-[5px] hidden' type="file" name="avatar" id="file" onChange={handleAvatar} />
 					<input className='p-3 border-none outline-none bg-[#111928] bg-opacity-60 text-white rounded-[5px]' type="text" name='username' placeholder='Username' />
 					<input className='p-3 border-none outline-none bg-[#111928] bg-opacity-60 text-white rounded-[5px]' type="text" name='email' placeholder='Email' />
 					<input className='p-3 border-none outline-none bg-[#111928] bg-opacity-60 text-white rounded-[5px]' type="password" name='password' placeholder='Password' />
