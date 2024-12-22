@@ -1,8 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
 import { toast } from 'react-toastify';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../lib/firebase';
 
 const Login = () => {
 	const [avatar, setAvatar] = useState({
