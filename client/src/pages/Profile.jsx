@@ -95,7 +95,7 @@ const Profile = () => {
       <div className="max-w-2xl mx-auto p-4">
         <div className="bg-base-300 rounded-xl p-6 space-y-4">
           <div className="text-center">
-            <h1 className="text-4xl text-white font-semibold">Profile</h1>
+            <h1 className="text-4xl font-semibold">Profile</h1>
             <p className="mt-2 text-lg">Your profile information</p>
           </div>
 
@@ -142,7 +142,7 @@ const Profile = () => {
 
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <div className="text-sm text-zinc-200 font-semibold flex items-center gap-2">
+              <div className="text-sm text-zinc-400 font-semibold flex items-center gap-2">
                 <User className="w-4 h-4" strokeWidth={3} />
                 Full Name
               </div>
@@ -152,7 +152,7 @@ const Profile = () => {
             </div>
 
             <div className="space-y-1.5">
-              <div className="text-sm text-zinc-200 font-semibold flex items-center gap-2">
+              <div className="text-sm text-zinc-400 font-semibold flex items-center gap-2">
                 <Mail className="w-4 h-4" strokeWidth={3} />
                 Email Address
               </div>
@@ -161,11 +161,11 @@ const Profile = () => {
           </div>
 
           <div className="mt-6 bg-base-300 rounded-xl p-3 px-6">
-            <h2 className="text-lg font-semibold text-zinc-200 mb-2">Account Information</h2>
+            <h2 className="text-lg font-semibold mb-2">Account Information</h2>
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between py-2 border-b border-zinc-700">
                 <span>Member Since</span>
-                <span className="text-zinc-200">{authUser?.createdAt?.split("T")[0]}</span>
+                <span>{authUser?.createdAt?.split("T")[0]}</span>
               </div>
               <div className="flex items-center justify-between py-2">
                 <span>Account Status</span>

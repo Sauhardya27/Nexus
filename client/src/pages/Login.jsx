@@ -31,7 +31,7 @@ const LoginPage = () => {
                             >
                                 <MessageSquare className="w-6 h-6 text-primary" />
                             </div>
-                            <h1 className="text-4xl text-white font-bold mt-2">Welcome Back</h1>
+                            <h1 className="text-4xl font-bold mt-2">Welcome Back</h1>
                             <p className="text-base-content">Sign in to your account</p>
                         </div>
                     </div>
