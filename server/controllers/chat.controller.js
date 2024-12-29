@@ -32,7 +32,7 @@ export const getChats = async (req, res) => {
 	}
 }
 
-export const sendMessage = async (req, res) => {
+export const sendChats = async (req, res) => {
 	try {
 		const { text, image } = req.body;
 		const { id: receiverId } = req.params;
@@ -57,7 +57,7 @@ export const sendMessage = async (req, res) => {
 
 		res.status(201).json(newChat);
 	} catch (error) {
-		console.log("Error in sendMessage controller:", error.message);
+		console.log("Error in sendChat controller:", error.message);
 		res.status(500).json({ error: "Internal server error" });
 	}
 }
