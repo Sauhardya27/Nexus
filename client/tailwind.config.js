@@ -1,22 +1,15 @@
+import tailwindScrollbar from 'tailwind-scrollbar';
+import daisyui from 'daisyui';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
-    extend: {
-      colors: {
-        customPink: 'rgba(230, 74, 105, 0.553)',
-        hoverRed: 'rgba(220, 20, 60, 0.796)',
-        customGray: '#dddddd35',
-        customDarkBlue: '#11192880',
-      },
-      borderColor: {
-        'custom-gray': '#dddddd35',
-      },
-    },
+    extend: {},
   },
   plugins: [
-    require('tailwind-scrollbar'),
-    require('daisyui'),
+    tailwindScrollbar,
+    daisyui,
   ],
   daisyui: {
     themes: [
@@ -55,4 +48,3 @@ export default {
     ],
   }
 }
-
