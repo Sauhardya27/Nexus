@@ -2,7 +2,7 @@
 
 A modern real-time chat application built with a powerful tech stack that enables seamless communication with features like instant messaging, image sharing, and emoji support.
 
-![Nexus Chat Logo](/public/logo.png)
+![Nexus Chat Logo](/client/public/logo.png)
 
 ## ✨ Features
 
@@ -115,8 +115,8 @@ Nexus/
 │   └── vite.config.js
 └── server/
     ├── controllers/
-	├── lib/
-	├── middleware/
+    ├── lib/
+    ├── middleware/
     ├── models/
     ├── routes/
     ├── seeds/
@@ -128,16 +128,16 @@ Nexus/
 ## 🎨 Screenshots
 
 ### Login Page
-![Login Page](/public/login.png)
+![Login Page](/client/public/login.png)
 
 ### Chat Interface
-![Chat Interface](/public/chat.png)
+![Chat Interface](/client/public/chat.png)
 
 ### Profile Page
-![Profile Page](/public/profile.png)
+![Profile Page](/client/public/profile.png)
 
 ### Settings Page
-![Settings Page](/public/settings.png)
+![Settings Page](/client/public/settings.png)
 
 ## 🤝 Contributing
 
