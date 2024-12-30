@@ -55,25 +55,13 @@ git clone https://github.com/Sauhardya27/Nexus.git
 cd Nexus
 ```
 
-2. Install dependencies for both frontend and backend
+2. Install dependencies for both server and client
 ```bash
-# Install frontend dependencies
-cd client
-npm install
-
-# Install backend dependencies
-cd ../server
-npm install
+npm run build
 ```
 
 3. Set up environment variables
 ```bash
-# Frontend (.env)
-REACT_APP_API_URL=your_api_url
-REACT_APP_SOCKET_URL=your_socket_url
-CLOUD_NAME=your_cloudinary_cloud_name
-REACT_APP_CLOUDINARY_UPLOAD_PRESET=your_upload_preset
-
 # Backend (.env)
 PORT=5001
 MONGODB_URI=your_mongodb_uri
@@ -83,7 +71,13 @@ CLOUD_API_KEY=your_cloudinary_api_key
 CLOUD_API_SECRET=your_cloudinary_api_secret
 ```
 
-4. Start the development servers
+4. Start the Application
+```bash
+# To start the application:
+npm start
+```
+
+5. Start the development servers
 ```bash
 # Start frontend (from client directory)
 npm run dev
@@ -153,7 +147,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## 📧 Contact
 
-Your Name - sauhardyachakraborty2643@gmail.com
+Sauhardya - sauhardyachakraborty2643@gmail.com<br>
 Project Link: [https://github.com/Sauhardya27/Nexus](https://github.com/Sauhardya27/Nexus)
 
 ---
