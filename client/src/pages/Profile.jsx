@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { Camera, Mail, User, Loader2, Image, Trash2 } from "lucide-react";
+import { Camera, Mail, User, Loader2, Image, Trash2, Edit3, Save, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 const Profile = () => {
@@ -11,6 +11,7 @@ const Profile = () => {
     updateWallpaper,
     checkAuth,
   } = useAuthStore();
+  
   const [avatar, setAvatar] = useState({
     file: null,
     url: authUser?.avatar || "/avatar.png",
@@ -25,6 +26,13 @@ const Profile = () => {
 
   const [isDeletingWallpaper, setIsDeletingWallpaper] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  
+  const [editingField, setEditingField] = useState(null);
+  const [formData, setFormData] = useState({
+    username: authUser?.username || "",
+    email: authUser?.email || "",
+  });
+  const [isUpdatingField, setIsUpdatingField] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -45,6 +53,15 @@ const Profile = () => {
         ...prev,
         url: authUser.wallpaper,
       }));
+    }
+  }, [authUser]);
+
+  useEffect(() => {
+    if (authUser) {
+      setFormData({
+        username: authUser.username || "",
+        email: authUser.email || "",
+      });
     }
   }, [authUser]);
 
@@ -181,6 +198,69 @@ const Profile = () => {
       });
     } finally {
       setIsDeletingWallpaper(false);
+    }
+  };
+
+  const handleEditField = (field) => {
+    setEditingField(field);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingField(null);
+    setFormData({
+      username: authUser?.username || "",
+      email: authUser?.email || "",
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveField = async () => {
+    if (!formData.username.trim()) {
+      return toast.error("Username cannot be empty");
+    }
+
+    if (!formData.email.trim()) {
+      return toast.error("Email cannot be empty");
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      return toast.error("Please enter a valid email address");
+    }
+
+    try {
+      setIsUpdatingField(true);
+
+      const updatedData = {};
+      if (formData.username !== authUser.username) {
+        updatedData.username = formData.username;
+      }
+      if (formData.email !== authUser.email) {
+        updatedData.email = formData.email;
+      }
+
+      if (Object.keys(updatedData).length > 0) {
+        await updateProfile(updatedData);
+      }
+
+      setEditingField(null);
+    } catch (error) {
+      console.error("Profile update error:", error);
+      toast.error(error.message || "Failed to update profile");
+      
+      setFormData({
+        username: authUser?.username || "",
+        email: authUser?.email || "",
+      });
+    } finally {
+      setIsUpdatingField(false);
     }
   };
 
@@ -373,24 +453,105 @@ const Profile = () => {
           </div>
 
           <div className="space-y-4">
+          
             <div className="space-y-1.5">
               <div className="text-sm text-zinc-400 font-semibold flex items-center gap-2">
                 <User className="w-4 h-4" strokeWidth={3} />
                 Full Name
               </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-xl border">
-                {authUser?.username}
-              </p>
+              {editingField === 'username' ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    className="flex-1 px-4 py-2.5 bg-base-200 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Enter your full name"
+                    disabled={isUpdatingField}
+                  />
+                  <button
+                    onClick={handleSaveField}
+                    disabled={isUpdatingField}
+                    className="px-3 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-colors duration-200 disabled:opacity-50"
+                  >
+                    {isUpdatingField ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <Save className="w-5 h-5" />
+                    )}
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    disabled={isUpdatingField}
+                    className="px-3 py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-xl transition-colors duration-200 disabled:opacity-50"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <p className="flex-1 px-4 py-2.5 bg-base-200 rounded-xl border">
+                    {authUser?.username}
+                  </p>
+                  <button
+                    onClick={() => handleEditField('username')}
+                    className="px-3 py-2.5 bg-primary hover:bg-primary-focus text-white rounded-xl transition-colors duration-200"
+                  >
+                    <Edit3 className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
             </div>
-
+            
             <div className="space-y-1.5">
               <div className="text-sm text-zinc-400 font-semibold flex items-center gap-2">
                 <Mail className="w-4 h-4" strokeWidth={3} />
                 Email Address
               </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-xl border">
-                {authUser?.email}
-              </p>
+              {editingField === 'email' ? (
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="flex-1 px-4 py-2.5 bg-base-200 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Enter your email address"
+                    disabled={isUpdatingField}
+                  />
+                  <button
+                    onClick={handleSaveField}
+                    disabled={isUpdatingField}
+                    className="px-3 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-colors duration-200 disabled:opacity-50"
+                  >
+                    {isUpdatingField ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <Save className="w-5 h-5" />
+                    )}
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    disabled={isUpdatingField}
+                    className="px-3 py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-xl transition-colors duration-200 disabled:opacity-50"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <p className="flex-1 px-4 py-2.5 bg-base-200 rounded-xl border">
+                    {authUser?.email}
+                  </p>
+                  <button
+                    onClick={() => handleEditField('email')}
+                    className="px-3 py-2.5 bg-primary hover:bg-primary-focus text-white rounded-xl transition-colors duration-200"
+                  >
+                    <Edit3 className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
