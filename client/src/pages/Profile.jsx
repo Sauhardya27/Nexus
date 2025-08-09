@@ -1,15 +1,30 @@
 import { useState, useEffect } from "react";
-import { useAuthStore } from '../store/useAuthStore';
-import { Camera, Mail, User, Loader2 } from "lucide-react";
+import { useAuthStore } from "../store/useAuthStore";
+import { Camera, Mail, User, Loader2, Image, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const Profile = () => {
-  const { authUser, isUpdatingProfile, updateProfile, checkAuth } = useAuthStore();
+  const {
+    authUser,
+    isUpdatingProfile,
+    updateProfile,
+    updateWallpaper,
+    checkAuth,
+  } = useAuthStore();
   const [avatar, setAvatar] = useState({
     file: null,
     url: authUser?.avatar || "/avatar.png",
-    isLoading: false 
+    isLoading: false,
   });
+
+  const [wallpaper, setWallpaper] = useState({
+    file: null,
+    url: authUser?.wallpaper || "",
+    isLoading: false,
+  });
+
+  const [isDeletingWallpaper, setIsDeletingWallpaper] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -17,18 +32,31 @@ const Profile = () => {
 
   useEffect(() => {
     if (authUser?.avatar) {
-      setAvatar(prev => ({
+      setAvatar((prev) => ({
         ...prev,
-        url: authUser.avatar
+        url: authUser.avatar,
       }));
     }
   }, [authUser]);
 
-  const uploadToCloudinary = async (file) => {
+  useEffect(() => {
+    if (authUser?.wallpaper) {
+      setWallpaper((prev) => ({
+        ...prev,
+        url: authUser.wallpaper,
+      }));
+    }
+  }, [authUser]);
+
+  const uploadToCloudinary = async (file, folder = "") => {
     try {
       const cloudinaryFormData = new FormData();
       cloudinaryFormData.append("file", file);
       cloudinaryFormData.append("upload_preset", "myCloud");
+
+      if (folder) {
+        cloudinaryFormData.append("folder", folder);
+      }
 
       const response = await fetch(
         "https://api.cloudinary.com/v1_1/nexuschatapp/image/upload",
@@ -54,46 +82,134 @@ const Profile = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      return toast.error('Please upload an image file');
+    if (!file.type.startsWith("image/")) {
+      return toast.error("Please upload an image file");
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      return toast.error('Image size should be less than 5MB');
+      return toast.error("Image size should be less than 5MB");
     }
 
     try {
       setAvatar({
         file: file,
         url: URL.createObjectURL(file),
-        isLoading: true  
+        isLoading: true,
       });
 
       const avatarUrl = await uploadToCloudinary(file);
       await updateProfile({ avatar: avatarUrl });
     } catch (error) {
-      console.error('Profile update error:', error);
-      toast.error(error.message || 'Failed to update profile picture');
+      console.error("Profile update error:", error);
+      toast.error(error.message || "Failed to update profile picture");
 
       setAvatar({
         file: null,
         url: authUser?.avatar || "/avatar.png",
-        isLoading: false  
+        isLoading: false,
       });
     }
   };
 
+  const handleWallpaperUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      return toast.error("Please upload an image file");
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      return toast.error("Wallpaper size should be less than 10MB");
+    }
+
+    try {
+      setWallpaper({
+        file: file,
+        url: URL.createObjectURL(file),
+        isLoading: true,
+      });
+
+      const wallpaperUrl = await uploadToCloudinary(
+        file,
+        "images/chat-wallpapers"
+      );
+
+      const updateResult = await updateWallpaper({ wallpaper: wallpaperUrl });
+
+      toast.success("Chat wallpaper updated successfully!");
+    } catch (error) {
+      console.error("Wallpaper update error:", error);
+      toast.error(error.message || "Failed to update chat wallpaper");
+
+      setWallpaper({
+        file: null,
+        url: authUser?.wallpaper || "",
+        isLoading: false,
+      });
+    }
+  };
+
+  const handleWallpaperDelete = async () => {
+    if (wallpaper.url === "") {
+      return toast.error("Default wallpaper is already active");
+    }
+
+    try {
+      setIsDeletingWallpaper(true);
+      setShowDeleteModal(false);
+
+      setWallpaper({
+        file: null,
+        url: "",
+        isLoading: false,
+      });
+
+      const updateResult = await updateWallpaper({
+        wallpaper: "",
+      });
+
+      toast.success("Chat wallpaper reset to default successfully!");
+    } catch (error) {
+      console.error("Wallpaper delete error:", error);
+      toast.error(error.message || "Failed to reset chat wallpaper");
+
+      setWallpaper({
+        file: null,
+        url: authUser?.wallpaper || "",
+        isLoading: false,
+      });
+    } finally {
+      setIsDeletingWallpaper(false);
+    }
+  };
+
+  const openDeleteModal = () => {
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+  };
+
   const handleImageLoad = () => {
-    setAvatar(prev => ({
+    setAvatar((prev) => ({
       ...prev,
-      isLoading: false
+      isLoading: false,
+    }));
+  };
+
+  const handleWallpaperLoad = () => {
+    setWallpaper((prev) => ({
+      ...prev,
+      isLoading: false,
     }));
   };
 
   return (
     <div className="min-h-screen pt-20">
       <div className="max-w-2xl mx-auto p-4">
-        <div className="bg-base-300 rounded-xl p-6 space-y-4">
+        <div className="bg-base-300 rounded-xl p-6 space-y-6">
           <div className="text-center">
             <h1 className="text-4xl font-semibold">Profile</h1>
             <p className="mt-2 text-lg">Your profile information</p>
@@ -121,7 +237,9 @@ const Profile = () => {
                   bg-base-content hover:scale-105
                   p-2 rounded-full cursor-pointer 
                   transition-all duration-200
-                  ${isUpdatingProfile ? "animate-pulse pointer-events-none" : ""}
+                  ${
+                    isUpdatingProfile ? "animate-pulse pointer-events-none" : ""
+                  }
                 `}
               >
                 <Camera className="w-5 h-5 text-base-200" />
@@ -136,8 +254,122 @@ const Profile = () => {
               </label>
             </div>
             <p className="text-sm text-zinc-400">
-              {isUpdatingProfile ? "Uploading..." : "Click the camera icon to update your photo"}
+              {isUpdatingProfile
+                ? "Uploading..."
+                : "Click the camera icon to update your photo"}
             </p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold">Chat Wallpaper</h2>
+              <p className="text-sm text-zinc-400 mt-1">
+                Customize your chat background
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative w-full max-w-xs">
+                <div className="w-full h-48 rounded-2xl border-4 border-zinc-600 relative overflow-hidden bg-gradient-to-br from-purple-200 to-pink-200">
+                  {/* Header */}
+                  <div className="absolute top-0 left-0 right-0 bg-gray-700 bg-opacity-90 text-white text-center py-2 text-base font-medium">
+                    Chat Wallpaper Preview
+                  </div>
+
+                  {wallpaper.isLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-base-200 z-10">
+                      <Loader2 className="w-8 h-8 animate-spin" />
+                    </div>
+                  )}
+
+                  {wallpaper.url === "" || !wallpaper.url ? (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-600">
+                      <div className="text-xl font-semibold mt-12 text-center">
+                        No Image Available
+                      </div>
+
+                      <svg
+                        className="w-28 h-28 text-gray-400 opacity-60"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M4 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H4zm16 2v8.59l-3.3-3.3a1 1 0 0 0-1.4 0L12 14.59l-2.3-2.3a1 1 0 0 0-1.4 0L4 16.59V6h16zM8 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <img
+                      src={wallpaper.url}
+                      alt="Chat Wallpaper Preview"
+                      className="w-full h-full object-cover transition-opacity duration-300"
+                      onLoad={handleWallpaperLoad}
+                      onError={() => {
+                        setWallpaper((prev) => ({
+                          ...prev,
+                          url: "",
+                        }));
+                      }}
+                    />
+                  )}
+                </div>
+
+                <label
+                  htmlFor="wallpaper-upload"
+                  className={`
+        absolute bottom-3 right-3 
+        bg-gray-700 hover:bg-gray-600 hover:scale-105
+        p-3 rounded-full cursor-pointer 
+        transition-all duration-200 shadow-lg border-2 border-white
+        ${
+          isUpdatingProfile || wallpaper.isLoading || isDeletingWallpaper
+            ? "animate-pulse pointer-events-none"
+            : ""
+        }
+      `}
+                >
+                  <Image className="w-6 h-6 text-white" />
+                  <input
+                    type="file"
+                    id="wallpaper-upload"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleWallpaperUpload}
+                    disabled={
+                      isUpdatingProfile ||
+                      wallpaper.isLoading ||
+                      isDeletingWallpaper
+                    }
+                  />
+                </label>
+
+                {wallpaper.url !== "" && wallpaper.url && (
+                  <button
+                    onClick={openDeleteModal}
+                    className={`
+          absolute bottom-3 left-3 
+          bg-red-600 hover:bg-red-700 hover:scale-105
+          p-3 rounded-full cursor-pointer 
+          transition-all duration-200 shadow-lg border-2 border-white
+          ${
+            isUpdatingProfile || wallpaper.isLoading || isDeletingWallpaper
+              ? "animate-pulse pointer-events-none"
+              : ""
+          }
+        `}
+                    disabled={
+                      isUpdatingProfile ||
+                      wallpaper.isLoading ||
+                      isDeletingWallpaper
+                    }
+                  >
+                    {isDeletingWallpaper ? (
+                      <Loader2 className="w-6 h-6 text-white animate-spin" />
+                    ) : (
+                      <Trash2 className="w-6 h-6 text-white" />
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -156,7 +388,9 @@ const Profile = () => {
                 <Mail className="w-4 h-4" strokeWidth={3} />
                 Email Address
               </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-xl border">{authUser?.email}</p>
+              <p className="px-4 py-2.5 bg-base-200 rounded-xl border">
+                {authUser?.email}
+              </p>
             </div>
           </div>
 
@@ -175,6 +409,43 @@ const Profile = () => {
           </div>
         </div>
       </div>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-base-300 rounded-xl p-6 w-full max-w-md mx-auto shadow-2xl border border-zinc-600">
+            <div className="text-center space-y-4">
+              <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold text-base-content">
+                  Reset Chat Wallpaper?
+                </h3>
+                <p className="mt-2 text-sm text-zinc-400">
+                  This will reset your chat wallpaper to the default. This
+                  action cannot be undone.
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={closeDeleteModal}
+                  className="flex-1 px-4 py-2 bg-base-200 hover:bg-base-100 text-base-content rounded-lg transition-colors duration-200 font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleWallpaperDelete}
+                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 font-medium"
+                >
+                  Reset Wallpaper
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

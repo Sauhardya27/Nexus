@@ -73,7 +73,7 @@ const SignUp = () => {
         };
 
         const result = await signup(userData);
-        console.log("Signup result:", result);
+        // console.log("Signup result:", result);
 
       } catch (error) {
         console.error("Full signup error:", error);

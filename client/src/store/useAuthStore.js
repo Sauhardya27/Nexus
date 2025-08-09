@@ -11,6 +11,7 @@ export const useAuthStore = create((set, get) => ({
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
+  isUpdatingWallpaper: false,
   isCheckingAuth: true,
   onlineUsers: [],
   socket: null,
@@ -99,6 +100,19 @@ export const useAuthStore = create((set, get) => ({
       toast.error(error.response.data.message);
     } finally {
       set({ isUpdatingProfile: false });
+    }
+  },
+
+  updateWallpaper: async (data) => {
+    set({ isUpdatingWallpaper: true });
+    try {
+      const res = await axiosInstance.put("/auth/update-wallpaper", data);
+      set({ authUser: res.data });
+    } catch (error) {
+      console.log("error in update wallpaper:", error);
+      toast.error(error.response.data.message);
+    } finally {
+      set({ isUpdatingWallpaper: false });
     }
   },
 

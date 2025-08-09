@@ -101,6 +101,28 @@ export const updateProfile = async (req, res) => {
 	}
 };
 
+export const updateWallpaper = async (req, res) => {
+	try {
+		const { wallpaper } = req.body;
+		const userId = req.user._id;
+
+		// if(!wallpaper){
+		// 	return res.status(400).json({ message: "Wallpaper is required" });
+		// }
+
+		const updatedUser = await User.findByIdAndUpdate(
+			userId, 
+			{ wallpaper: wallpaper }, 
+			{ new: true }
+		);
+
+		res.status(200).json(updatedUser);
+	} catch (error) {
+		console.log("Error in update wallpaper", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
 export const checkAuth = (req, res) => {
 	try {
 		res.status(200).json(req.user);

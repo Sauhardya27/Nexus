@@ -14,11 +14,15 @@ const userSchema = new mongoose.Schema(
     password: { 
       type: String, 
       required: true 
-    }, // Hashing needed
+    },
     avatar: { 
       type: String, 
       default: "" 
     },
+    wallpaper: {
+      type: String,
+      default: ""
+    }
   },
   { timestamps: true }
 );
