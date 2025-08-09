@@ -1,16 +1,17 @@
-import tailwindScrollbar from 'tailwind-scrollbar';
-import daisyui from 'daisyui';
+import tailwindScrollbar from "tailwind-scrollbar";
+import daisyui from "daisyui";
 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        playfair: ['"Playfair Display"', "serif"],
+      },
+    },
   },
-  plugins: [
-    tailwindScrollbar,
-    daisyui,
-  ],
+  plugins: [tailwindScrollbar, daisyui],
   daisyui: {
     themes: [
       "light",
@@ -46,5 +47,5 @@ export default {
       "nord",
       "sunset",
     ],
-  }
-}
+  },
+};

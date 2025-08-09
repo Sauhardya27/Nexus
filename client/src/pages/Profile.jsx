@@ -8,7 +8,7 @@ const Profile = () => {
   const [avatar, setAvatar] = useState({
     file: null,
     url: authUser?.avatar || "/avatar.png",
-    isLoading: false  // Changed to false by default
+    isLoading: false 
   });
 
   useEffect(() => {
@@ -66,7 +66,7 @@ const Profile = () => {
       setAvatar({
         file: file,
         url: URL.createObjectURL(file),
-        isLoading: true  // Set to true only when uploading a new image
+        isLoading: true  
       });
 
       const avatarUrl = await uploadToCloudinary(file);
@@ -78,7 +78,7 @@ const Profile = () => {
       setAvatar({
         file: null,
         url: authUser?.avatar || "/avatar.png",
-        isLoading: false  // Set back to false if there's an error
+        isLoading: false  
       });
     }
   };

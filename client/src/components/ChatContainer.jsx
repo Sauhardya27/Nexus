@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useChatStore } from '../store/useChatStore';
 import { useAuthStore } from '../store/useAuthStore';
 import ChatHeader from './ChatHeader';
@@ -36,7 +36,7 @@ const ChatContainer = () => {
     )
   }
   return (
-    <div className='flex-1 flex flex-col overflow-auto'>
+    <div className='flex-1 flex flex-col overflow-auto bg-base-100'>
       <ChatHeader />
 
       <div className='flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-base-300'>
@@ -64,7 +64,11 @@ const ChatContainer = () => {
                 {formatMessageTime(chat.createdAt)}
               </time>
             </div>
-            <div className="chat-bubble flex flex-col">
+            <div className={`chat-bubble flex flex-col shadow-lg transition-all duration-200 hover:scale-[1.02]
+              ${chat.senderId === authUser._id 
+                ? 'bg-primary text-primary-content shadow-primary/20 border border-primary/30' 
+                : 'bg-base-200 text-base-content border border-base-300'
+              }`}>
               {chat.image && (
                 <img
                   src={chat.image}
@@ -76,6 +80,7 @@ const ChatContainer = () => {
             </div>
           </div>
         ))}
+        <div ref={chatEndRef} />
       </div>
 
       <ChatInput />
@@ -83,4 +88,4 @@ const ChatContainer = () => {
   )
 }
 
-export default ChatContainer
+export default ChatContainer;
